@@ -211,9 +211,11 @@ function mainFunction() {
 function infixValidator(a){
   correct=true;
   for(i=0;i<a.length;i++){ 
-    if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!='('  && a[i]!=')')
+    if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!='('  && a[i]!=')' && a[i]!=' ')
       correct=false;
   }
+
+  if(isInTable(a[0],operators)) return false;
   parenthesisCounter=0;
   phase=1; //1-operator/parenthesis 2-operand
   for(i=0;i<a.length;i++){
