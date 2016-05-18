@@ -5,17 +5,6 @@ legalOperands = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B',
 
 
 function inToPost(a){
-  correct=true;
-  for(i=0;i<a.length;i++){   //Jakies gowno sprawdzenie poprawnosci
-    temp=false;
-    for(j=0;j<operators.length;j++){
-        if(a[i]==operators[j] || a[i].charCodeAt(0)>=48 && a[i].charCodeAt(0)>57)
-          temp=true;
-    }
-    if(temp==false){
-      correct=false;
-    }
-  }
   solution=''
   var stack=new Array();
   for(i=0;i<a.length;i++){  //Lecimy po wszystkich znakach
@@ -103,7 +92,6 @@ function postToIn(a){
   }
   return stack.pop();
 }
-
 function preToPost(a){
   foundSpace = false;
   stack = [""];
@@ -151,7 +139,6 @@ function preToPost(a){
 
 function mainFunction() {   
     formula =document.getElementById("input").value;
-    //window.alert(inToPost(formula));
     var radios = document.getElementsByName('from');
     var rad1;
     for (var i = 0, length = radios.length; i < length; i++) {
@@ -180,15 +167,21 @@ function mainFunction() {
       }
     }
     if(rad1==1){
-      if(rad2==0){
+      if(infixValidator(formula)){
+        document.getElementById("button").style.background='#7BCC70';
+        if(rad2==0){
         document.getElementById("output").value=inToPre(formula);
+        }
+        if(rad2==1){
+          document.getElementById("output").value=formula;
+        }
+        if(rad2==2){
+          document.getElementById("output").value=inToPost(formula);
+        }
       }
-      if(rad2==1){
-        document.getElementById("output").value=formula;
-      }
-      if(rad2==2){
-        document.getElementById("output").value=inToPost(formula);
-      }
+      else{
+        document.getElementById("button").style.background='#EE3B3B';
+      }     
     }
     if(rad1==2){
       if(rad2==0){
@@ -203,22 +196,74 @@ function mainFunction() {
     }
 }
 
+function infixValidator(a){
+  correct=true;
+  for(i=0;i<a.length;i++){ 
+    if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!='('  && a[i]!=')')
+      correct=false;
+  }
+  parenthesisCounter=0;
+  phase=1; //1-operator/parenthesis 2-operand
+  for(i=0;i<a.length;i++){
+    if(isInTable(a[i],legalOperands)){
+      while(a[i+1]==' '){
+        i++
+      }
+      if(a[i+1]=='('){
+        //window.alert("Blad")
+        correct=false;
+      }
+    }
+    if(isInTable(a[i],operators)){
+      while(a[i+1]==' '){
+        i++;
+      }
+      if(!isInTable(a[i+1],legalOperands) && a[i+1]!='('){
+        //window.alert("Blad")
+        correct=false;
+      }
+    }
+    if(a[i]==')'){
+      parenthesisCounter--;
+      while(a[i+1]==' '){
+        i++
+      }
+      if(a[i+1]=='(' || isInTable(a[i+1],legalOperands)){
+        //window.alert("Blad")
+        correct=false;
+      }
+    }
+    if(a[i]=='('){
+      parenthesisCounter++;
+      while(a[i+1]==' '){
+        i++
+      }
+      if(!isInTable(a[i+1],legalOperands) && a[i+1]!='('){
+        window.alert("Blad")
+        correct=false;
+      }
+    }
+  }
+  if(parenthesisCounter!=0)
+    correct=false;
+  return correct;
+}
 
 
 function isInTable(el, tab) {
-		isIt = false;
+    isIt = false;
     for(j=0;j<tab.length;j++){
-    	if(tab[j]==el)   	
-      	isIt=true;
+      if(tab[j]==el)    
+        isIt=true;
     }
     return isIt;
 }
 
 function operatorValue(el) {
-		if(el=='+' || el=='-')
-    	return 1;
+    if(el=='+' || el=='-')
+      return 1;
     if(el=='/' || el=='*')
-    	return 2;
+      return 2;
      if(el=='^' || el=='%')
-    	return 3;
+      return 3;
 }
