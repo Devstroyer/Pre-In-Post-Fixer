@@ -94,7 +94,7 @@ function postToIn(a){
 }
 function preToPost(a){
   foundSpace = false;
-  stack = [""];
+  stack = [];
 
   // Rozpatrujac wejscie od tylu
   for(i = a.length-1; i >= 0; --i)
@@ -103,9 +103,11 @@ function preToPost(a){
     // Znaleziono operator, mozna stworzyc wyrazenie
     if(isInTable(a[i], operators))
     {
+      if(stack.length < 2) return -1;
+
       operand1 = stack.pop();
       operand2 = stack.pop();
-      stack.push(operand1 + operand2 + a[i]);
+      stack.push(operand1 + " " + operand2 + a[i]);
 
       // Markuj znalezienie spacji, zeby oznaczyc koniec
       // obecnej liczby
@@ -123,7 +125,8 @@ function preToPost(a){
       }
 
       // W przeciwnym wypadku, doklej do ostatniego operandu
-      else stack.push(a[i] + stack.pop());
+      // jesli istnieje (spacja mogla byc na koncu)
+      else stack.push(a[i] + (stack.length > 0 ? stack.pop() : ''));
     }
 
     // Znaleziono spacje
@@ -134,7 +137,8 @@ function preToPost(a){
     console.log(stack);
   }
 
-  return stack.pop();
+  if(stack.length != 1) return -1;
+  else return stack.pop();
 }
 
 function mainFunction() {   
@@ -156,15 +160,23 @@ function mainFunction() {
       }
     }
     if(rad1==0){
-      if(rad2==0){
-        document.getElementById("output").value=formula;
-      }
-      if(rad2==1){
-        document.getElementById("output").value=postToIn(preToPost(formula));
-      }
-      if(rad2==2){
-        document.getElementById("output").value=preToPost(formula);
-      }
+      toPostResult = preToPost(formula)
+      if(toPostResult != -1)
+      {
+        document.getElementById("button").style.background='#7BCC70';
+
+        if(rad2==0){
+          document.getElementById("output").value=formula;
+        }
+        if(rad2==1){
+          document.getElementById("output").value=postToIn(toPostResult);
+        }
+        if(rad2==2){
+          document.getElementById("output").value=toPostResult;
+        }
+      } else{
+        document.getElementById("button").style.background='#EE3B3B';
+      }   
     }
     if(rad1==1){
       if(infixValidator(formula)){
