@@ -103,7 +103,6 @@ function postToIn(a){
 
 function mainFunction() {   
     formula =document.getElementById("input").value;
-    document.getElementById("output").value='asdasdasd';
     //window.alert(inToPost(formula));
     var radios = document.getElementsByName('from');
     var rad1;
