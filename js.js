@@ -1,4 +1,7 @@
 operators=['+','-','*','/','^','%'];
+legalOperands = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B',
+                  'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                  'O', 'P', 'R', 'S', 'T', 'U', 'W', 'X', 'Y', 'Z'];
 
 
 function inToPost(a){
@@ -101,6 +104,51 @@ function postToIn(a){
   return stack.pop();
 }
 
+function preToPost(a){
+  foundSpace = false;
+  stack = [""];
+
+  // Rozpatrujac wejscie od tylu
+  for(i = a.length-1; i >= 0; --i)
+  {
+    console.log(a[i] + ", spacja: " + foundSpace);
+    // Znaleziono operator, mozna stworzyc wyrazenie
+    if(isInTable(a[i], operators))
+    {
+      operand1 = stack.pop();
+      operand2 = stack.pop();
+      stack.push(operand1 + operand2 + a[i]);
+
+      // Markuj znalezienie spacji, zeby oznaczyc koniec
+      // obecnej liczby
+      foundSpace = true;
+    }
+
+    // Znaleziono dopuszczalny operand
+    else if(isInTable(a[i], legalOperands))
+    {
+      // Jesli wczesniej wystapila stacja, push
+      if(foundSpace)
+      {
+        foundSpace = false;
+        stack.push(a[i]);
+      }
+
+      // W przeciwnym wypadku, doklej do ostatniego operandu
+      else stack.push(a[i] + stack.pop());
+    }
+
+    // Znaleziono spacje
+    else if(a[i] == ' ')
+    {
+      foundSpace = true;
+    }
+    console.log(stack);
+  }
+
+  return stack.pop();
+}
+
 function mainFunction() {   
     formula =document.getElementById("input").value;
     //window.alert(inToPost(formula));
@@ -125,10 +173,10 @@ function mainFunction() {
         document.getElementById("output").value=formula;
       }
       if(rad2==1){
-        document.getElementById("output").value="Not supported yet";
+        document.getElementById("output").value=postToIn(preToPost(formula));
       }
       if(rad2==2){
-        document.getElementById("output").value="Not supported yet"
+        document.getElementById("output").value=preToPost(formula);
       }
     }
     if(rad1==1){
