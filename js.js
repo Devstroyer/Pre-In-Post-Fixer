@@ -87,10 +87,12 @@ function postToIn(a){
         temp2=stack.pop();
         solutionEnd='('+temp2+''+a[i]+temp1+')';
         stack.push(solutionEnd);
-      }
+      } else return -1;
     }
   }
-  return stack.pop();
+
+  if(stack.length != 1) return -1;
+  else return stack.pop();
 }
 function preToPost(a){
   foundSpace = false;
@@ -196,14 +198,22 @@ function mainFunction() {
       }     
     }
     if(rad1==2){
-      if(rad2==0){
-         document.getElementById("output").value=postToPre(formula);
-      }
-      if(rad2==1){
-        document.getElementById("output").value=postToIn(formula);
-      }
-      if(rad2==2){
-        document.getElementById("output").value=formula;
+      toInResult = postToIn(formula)
+      if(toInResult != -1)
+      {
+        document.getElementById("button").style.background='#7BCC70';
+
+        if(rad2==0){
+           document.getElementById("output").value=postToPre(formula);
+        }
+        if(rad2==1){
+          document.getElementById("output").value=toInResult;
+        }
+        if(rad2==2){
+          document.getElementById("output").value=formula;
+        }
+      } else{
+        document.getElementById("button").style.background='#EE3B3B';
       }
     }
 }
