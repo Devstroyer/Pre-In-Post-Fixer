@@ -3,46 +3,62 @@ legalOperands = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B',
                   'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
                   'O', 'P', 'R', 'S', 'T', 'U', 'W', 'X', 'Y', 'Z'];
 
-
+// ================== FUNKCJE INFIX -> SOMETHING I WALIDATOR ======================
 function inToPost(a){
   solution=''
   var stack=new Array();
-  for(i=0;i<a.length;i++){  //Lecimy po wszystkich znakach
-    if(a.charCodeAt(i)>=48 && a.charCodeAt(i)<=57){ //Znaleziono cyfre
+
+  //Lecimy po wszystkich znakach
+  for(i=0;i<a.length;i++){  
+    //Znaleziono operand
+    if(isInTable(a[i], legalOperands)){ 
       solution+=a[i];
+
       if(i+1<a.length){
-        while(a.charCodeAt(i+1)>=48 && a.charCodeAt(i+1)<=57){ //Dalej tez moga byc cyfry ktore tworza liczbe
+        //Dalej tez moga byc cyfry ktore tworza liczbe
+        while(isInTable(a[i+1], legalOperands)){ 
           solution+=a[i+1];
           i++;
         }
       }
       solution+=' ';
      }
-     if(isInTable(a[i],operators)){  //Znaleziono operator
-      if(stack.length>0){ //Pierwszy operator mozna spokojnie pushowac kolejne juz trzeba sprawdzac
+
+     //Znaleziono operator
+     if(isInTable(a[i],operators)){  
+      //Pierwszy operator mozna spokojnie pushowac kolejne juz trzeba sprawdzac
+      if(stack.length>0){ 
         tempChar=stack.pop();
-        if(tempChar=='('){ //Pierwszy operator po otwierajacy nawiasie wiec mozna pushnac spokojnie
+        //Pierwszy operator po otwierajacy nawiasie wiec mozna pushnac spokojnie
+        if(tempChar=='('){ 
           stack.push(tempChar);
           stack.push(a[i]);
         }
+
         else{
-          while(operatorValue(tempChar)>=operatorValue(a[i]) && tempChar!=undefined && tempChar!='('){ //Sprawdz wagi operatorow na stosie i wywalaj dopoki sa wieksze niz aktualny znak badz kaniec stosu lub znajdziesz nawias otwierajacy
+          //Sprawdz wagi operatorow na stosie i wywalaj dopoki sa wieksze niz aktualny znak badz kaniec stosu lub znajdziesz nawias otwierajacy
+          while(operatorValue(tempChar)>=operatorValue(a[i]) && tempChar!=undefined && tempChar!='('){ 
             solution+=tempChar;
             tempChar=stack.pop();
           }
+          
           if(tempChar!=undefined && tempChar!='(')
             stack.push(tempChar);
           stack.push(a[i]);
         }
       }
+
       else{
         stack.push(a[i]);
       }   
      }
+
      if(a[i]=='('){
         stack.push(a[i]);
      }
-     if(a[i]==')'){ //nawias zamykajacy popuje wszystko do otwierajacego na stosie
+
+     //nawias zamykajacy popuje wszystko do otwierajacego na stosie
+     if(a[i]==')'){ 
         tempChar=stack.pop();
         while(tempChar!=undefined && tempChar!='('){
           if(tempChar!='(')
@@ -51,9 +67,12 @@ function inToPost(a){
         }
      }
    }
-  while(stack.length>0){ //wywal wszystko ze stosuna koniec i gitara
+
+  //wywal wszystko ze stosuna koniec i gitara
+  while(stack.length>0){ 
     solution+=stack.pop();
   }
+
   return solution
 }
 
@@ -62,6 +81,73 @@ function inToPre(a){
   return inToPost(b).split("").reverse().join("");
 }
 
+function infixValidator(a){
+  correct=true;
+
+  for(i=0;i<a.length;i++){ 
+    if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!='('  && a[i]!=')' && a[i]!=' ')
+      correct=false;
+  }
+
+  if(isInTable(a[0],operators)) return false;
+  parenthesisCounter=0;
+  phase=1; // 1-operator/parenthesis 2-operand
+
+  for(i=0;i<a.length;i++){
+    if(isInTable(a[i],legalOperands)){
+      while(a[i+1]==' '){
+        i++
+      }
+
+      if(a[i+1]=='('){
+        //window.alert("Blad")
+        correct=false;
+      }
+    }
+
+    if(isInTable(a[i],operators)){
+      while(a[i+1]==' '){
+        i++;
+      }
+
+      if(!isInTable(a[i+1],legalOperands) && a[i+1]!='('){
+        //window.alert("Blad")
+        correct=false;
+      }
+    }
+
+    if(a[i]==')'){
+      parenthesisCounter--;
+      while(a[i+1]==' '){
+        i++
+      }
+
+      if(a[i+1]=='(' || isInTable(a[i+1],legalOperands)){
+        //window.alert("Blad")
+        correct=false;
+      }
+    }
+
+    if(a[i]=='('){
+      parenthesisCounter++;
+      while(a[i+1]==' '){
+        i++
+      }
+
+      if(!isInTable(a[i+1],legalOperands) && a[i+1]!='('){
+        window.alert("Blad")
+        correct=false;
+      }
+    }
+  }
+
+  if(parenthesisCounter!=0)
+    correct=false;
+  return correct;
+}
+
+// ========================= FUNKCJE POSTFIX -> SOMETHING =========================
+
 function postToPre(a){
   return inToPre(postToIn(a));
 }
@@ -69,19 +155,24 @@ function postToPre(a){
 function postToIn(a){
   stack=new Array();
   solutionEnd='';
-  for(i=0;i<a.length;i++){  //Postfix to Infix
+
+  for(i=0;i<a.length;i++){
     solution='';
-    if(a.charCodeAt(i)>=48 && a.charCodeAt(i)<=57){ 
+
+    if(isInTable(a[i], legalOperands)){ 
       solution+=a[i];
       if(i+1<a.length){
-        while(a.charCodeAt(i+1)>=48 && a.charCodeAt(i+1)<=57){
+        while(isInTable(a[i+1], legalOperands)){
           solution+=a[i+1];
           i++;
         }
       }
+
       stack.push(solution);
     }
-    if(isInTable(a[i],operators)){  //Znaleziono operator
+
+    //Znaleziono operator
+    if(isInTable(a[i],operators)){  
       if(stack.length>=2){
         temp1=stack.pop();
         temp2=stack.pop();
@@ -94,6 +185,9 @@ function postToIn(a){
   if(stack.length != 1) return -1;
   else return stack.pop();
 }
+
+// ========================= FUNKCJE PREFIX -> SOMETHING =========================
+
 function preToPost(a){
   foundSpace = false;
   stack = [];
@@ -143,26 +237,34 @@ function preToPost(a){
   else return stack.pop();
 }
 
+// ==================================== MAIN ==================================
+
 function mainFunction() {   
-    formula =document.getElementById("input").value;
+    formula = document.getElementById("input").value;
     var radios = document.getElementsByName('from');
     var rad1;
+
     for (var i = 0, length = radios.length; i < length; i++) {
       if (radios[i].checked) {
         rad1=i;
         break;
       }
     }
+
     var radios = document.getElementsByName('to');
     var rad2;
+
     for (var i = 0, length = radios.length; i < length; i++) {
       if (radios[i].checked) {
         rad2=i;
         break;
       }
     }
+
+    // Wybrano konwersje z prefixa
     if(rad1==0){
       toPostResult = preToPost(formula)
+
       if(toPostResult != -1)
       {
         document.getElementById("button").style.background='#7BCC70';
@@ -180,6 +282,8 @@ function mainFunction() {
         document.getElementById("button").style.background='#EE3B3B';
       }   
     }
+
+    // Wybrano konwersje z infixa
     if(rad1==1){
       if(infixValidator(formula)){
         document.getElementById("button").style.background='#7BCC70';
@@ -197,8 +301,11 @@ function mainFunction() {
         document.getElementById("button").style.background='#EE3B3B';
       }     
     }
+
+    // Wybrano konwersje z postfixa
     if(rad1==2){
       toInResult = postToIn(formula)
+      
       if(toInResult != -1)
       {
         document.getElementById("button").style.background='#7BCC70';
@@ -218,67 +325,18 @@ function mainFunction() {
     }
 }
 
-function infixValidator(a){
-  correct=true;
-  for(i=0;i<a.length;i++){ 
-    if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!='('  && a[i]!=')' && a[i]!=' ')
-      correct=false;
-  }
 
-  if(isInTable(a[0],operators)) return false;
-  parenthesisCounter=0;
-  phase=1; //1-operator/parenthesis 2-operand
-  for(i=0;i<a.length;i++){
-    if(isInTable(a[i],legalOperands)){
-      while(a[i+1]==' '){
-        i++
-      }
-      if(a[i+1]=='('){
-        //window.alert("Blad")
-        correct=false;
-      }
-    }
-    if(isInTable(a[i],operators)){
-      while(a[i+1]==' '){
-        i++;
-      }
-      if(!isInTable(a[i+1],legalOperands) && a[i+1]!='('){
-        //window.alert("Blad")
-        correct=false;
-      }
-    }
-    if(a[i]==')'){
-      parenthesisCounter--;
-      while(a[i+1]==' '){
-        i++
-      }
-      if(a[i+1]=='(' || isInTable(a[i+1],legalOperands)){
-        //window.alert("Blad")
-        correct=false;
-      }
-    }
-    if(a[i]=='('){
-      parenthesisCounter++;
-      while(a[i+1]==' '){
-        i++
-      }
-      if(!isInTable(a[i+1],legalOperands) && a[i+1]!='('){
-        window.alert("Blad")
-        correct=false;
-      }
-    }
-  }
-  if(parenthesisCounter!=0)
-    correct=false;
-  return correct;
-}
 
+// =============================== FUNKCJE POMOCNICZE ============================
 
 function isInTable(el, tab) {
     isIt = false;
     for(j=0;j<tab.length;j++){
-      if(tab[j]==el)    
+      if(tab[j]==el)
+      {    
         isIt=true;
+        break;
+      }
     }
     return isIt;
 }
