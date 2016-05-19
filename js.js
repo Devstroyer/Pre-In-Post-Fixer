@@ -153,6 +153,10 @@ function postToPre(a){
 }
 
 function postToIn(a){
+	for(i=0;i<a.length;i++){ 
+    	if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!='('  && a[i]!=')' && a[i]!=' ')
+      		return-1;
+  	}
   stack=new Array();
   solutionEnd='';
 
@@ -189,6 +193,10 @@ function postToIn(a){
 // ========================= FUNKCJE PREFIX -> SOMETHING =========================
 
 function preToPost(a){
+	for(i=0;i<a.length;i++){ 
+    	if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!='('  && a[i]!=')' && a[i]!=' ')
+      		return-1;
+  	}
   foundSpace = false;
   stack = [];
 
