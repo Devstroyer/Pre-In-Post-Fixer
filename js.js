@@ -154,7 +154,7 @@ function postToPre(a){
 
 function postToIn(a){
 	for(i=0;i<a.length;i++){ 
-    	if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!='('  && a[i]!=')' && a[i]!=' ')
+    	if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!=' ')
       		return-1;
   	}
   stack=new Array();
@@ -194,7 +194,7 @@ function postToIn(a){
 
 function preToPost(a){
 	for(i=0;i<a.length;i++){ 
-    	if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!='('  && a[i]!=')' && a[i]!=' ')
+    	if(!isInTable(a[i],legalOperands) && !isInTable(a[i],operators) && a[i]!=' ')
       		return-1;
   	}
   foundSpace = false;
